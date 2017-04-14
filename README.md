@@ -1,7 +1,7 @@
-#Считалочка
+# Считалочка
 
-##Зависимости
+## Зависимости
 * ```Qt```
 
-##Скриншот
+## Скриншот
 ![img](https://github.com/Imperger/FindDigits/blob/master/screenshot.png)
