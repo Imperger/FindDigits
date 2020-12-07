@@ -1,5 +1,5 @@
 #include "Computer.h"
-
+#include <utility>
 
 void Computer::BruteForce()
 {	
@@ -108,6 +108,92 @@ void Computer::HasVariableValue()
 			var->Remove(knownVars);
 	}
 }
+void Computer::SubtractionWithCarry()
+{
+	for (auto& exp : expressions)
+	{
+		const VariablesGroup* minued = nullptr;
+		std::pair<const VariablesGroup*, const VariablesGroup*> others;
+
+		if (exp.Operator() == '-')
+		{
+			minued = &exp.Group(GroupIndex::LEFT);
+
+			others.first = &exp.Group(GroupIndex::RIGHT);
+			others.second = &exp.Group(GroupIndex::RESULT);
+		}
+		else // +
+		{
+			minued = &exp.Group(GroupIndex::RESULT);
+
+			others.first = &exp.Group(GroupIndex::LEFT);
+			others.second = &exp.Group(GroupIndex::RIGHT);
+		}
+
+		const VariablesGroup* lesser = nullptr;
+		const VariablesGroup* third = nullptr;
+		if (others.first->Size() < minued->Size())
+		{
+			lesser = others.first;
+
+			if (others.second->Size() == minued->Size())
+			{
+				third = others.second;
+			}
+			else
+			{
+				continue;
+			}
+		}
+		else if (others.second->Size() < minued->Size())
+		{
+			lesser = others.second;
+
+			if (others.first->Size() == minued->Size())
+			{
+				third = others.first;
+			}
+			else
+			{
+				continue;
+			}
+		}
+		else
+		{
+			continue;
+		}
+
+
+		size_t interestIdx = minued->Size() - lesser->Size() - 1;
+		Variable* minuedTarget = minued->Variables()[interestIdx];
+		Variable* thirdTarget = third->Variables()[interestIdx];
+
+		if (minuedTarget->Name() == thirdTarget->Name())
+			continue;
+
+		std::vector<VariableValue> minuedRemove, thirdWl;
+		minuedTarget->HoldValue(0);
+		for (bool next = minuedTarget->ValuesCount(); next; next = !minuedTarget->HoldNext())
+		{
+			if (!thirdTarget->Has(minuedTarget->Value() - 1))
+			{
+				minuedRemove.push_back(minuedTarget->Value());
+			}
+			else
+			{
+				thirdWl.push_back(minuedTarget->Value() - 1);
+			}
+		}
+
+		if (!minuedRemove.empty())
+		{
+			minuedTarget->Remove(minuedRemove);
+			thirdTarget->RemoveAllExcept(thirdWl);
+		}
+
+		minuedTarget->UnHold();
+	}
+}
 Variable& Computer::GetVariable(char name)
 {
 	Variable* var = nullptr;
@@ -163,7 +249,8 @@ void Computer::Optimize(function<void(size_t)> optimizationRound, function<void(
 	vector<tuple<string, function<void(void)>, bool>> optimisationFuncs
 	{ make_tuple( "FirstCantBeZero", bind(&Computer::FirstCantBeZero, this), false ),
 		make_tuple("EqualLastVariable", bind(&Computer::EqualLastVariable, this), true) ,
-	 make_tuple("HasVariableValue", bind(&Computer::HasVariableValue, this), true) };
+	 make_tuple("HasVariableValue", bind(&Computer::HasVariableValue, this), true),
+	make_tuple("SubtractionWithCarry", bind(&Computer::SubtractionWithCarry, this), true)};
 
 	bool needReoptimization = true;
 	bool skipNonReopt = false;

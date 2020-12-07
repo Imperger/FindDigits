@@ -25,6 +25,18 @@ VariableValue Variable::Value() const
 	else
 		return NO_VALUE;
 }
+VariableValue Variable::MinValue() const
+{
+	return *possibleValue.begin();
+}
+VariableValue Variable::MaxValue() const
+{
+	return *possibleValue.rbegin();
+}
+bool Variable::Has(const VariableValue & val) const
+{
+	return std::any_of(possibleValue.begin(), possibleValue.end(), [&](const VariableValue& x) { return x == val; });
+}
 void Variable::Remove(const VariableValue val)
 {
 	possibleValue.erase(remove(possibleValue.begin(), possibleValue.end(), val), possibleValue.end());
@@ -55,6 +67,10 @@ void Variable::RemoveAllExcept(const vector<VariableValue>& values)
 			return checkVal == pVal;
 		});
 	}), possibleValue.end());
+}
+void Variable::RemoveLessThan(VariableValue val)
+{
+	possibleValue.erase(remove_if(possibleValue.begin(), possibleValue.end(), [&val](const VariableValue& checkVal) { return checkVal < val; }), possibleValue.end());
 }
 void Variable::HoldValue(size_t index)
 {

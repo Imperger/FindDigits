@@ -34,6 +34,7 @@ class Computer: public QObject
 	void FirstCantBeZero();
 	void EqualLastVariable();
 	void HasVariableValue();
+	void SubtractionWithCarry();
 	Variable& GetVariable(char name);
 	VariablesGroup& GetGroup(string name);
 public:

@@ -17,10 +17,14 @@ public:
 	char Name() const;
 	bool HasValue() const;
 	VariableValue Value() const;
+	VariableValue MinValue() const;
+	VariableValue MaxValue() const;
+	bool Has(const VariableValue& val) const;
 	void Remove(const VariableValue val);
 	void Remove(const vector<VariableValue>& values);
 	void RemoveAllExcept(const VariableValue val);
 	void RemoveAllExcept(const vector<VariableValue>& values);
+	void RemoveLessThan(VariableValue val);
 	void HoldValue(size_t index);
 	void UnHold();
 	size_t ValuesCount() const;

@@ -29,6 +29,10 @@ const vector<Variable*>& VariablesGroup::Variables() const
 {
 	return group;
 }
+size_t VariablesGroup::Size() const
+{
+	return group.size();
+}
 string VariablesGroup::Name() const
 {
 	return accumulate(group.cbegin(), group.cend(), string(""), [](string name, Variable* var) 
